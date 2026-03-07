@@ -1,0 +1,28 @@
+{
+  "name": "nagarsetu",
+  "version": "1.0.0",
+  "description": "Civic issue reporting and management platform",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "web",
+    "shared"
+  ],
+  "scripts": {
+    "backend": "npm run dev --workspace=backend",
+    "web": "npm run dev --workspace=web",
+    "build:web": "npm run build --workspace=web",
+    "install:all": "npm install"
+  },
+  "keywords": [
+    "civic",
+    "issues",
+    "reporting",
+    "municipality"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^7.1.0"
+  }
+}
