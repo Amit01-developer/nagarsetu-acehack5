@@ -49,12 +49,36 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 dark:from-dark-surface dark:to-dark-bg text-white smooth-transition py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-gradient-to-br from-primary-600 to-primary-800 dark:from-dark-surface dark:to-dark-bg text-white smooth-transition py-20 overflow-hidden">
+        {/* Cityscape Background */}
+        <div className="absolute inset-0 opacity-20 dark:opacity-10">
+          <div className="absolute bottom-0 left-0 right-0 h-64">
+            <img 
+              src="/cityscape.svg" 
+              alt="" 
+              className="w-full h-full object-cover object-bottom"
+              style={{ 
+                filter: 'brightness(0.8) contrast(1.2)',
+                transform: 'scaleX(2)',
+                objectFit: 'cover',
+                objectPosition: 'bottom'
+              }}
+            />
+          </div>
+        </div>
+        
+        {/* Content */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ zIndex: 50 }}>
           <div className="text-center max-w-3xl mx-auto animate-fade-up">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 hero-title-shadow" style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontWeight: 700, letterSpacing: '-0.02em' }}>
-              <span className="text-white dark:text-dark-text-primary">Welcome to</span>
-              <span className="block mt-2 hero-title-gradient" style={{ fontStyle: 'italic', fontSize: '1.1em' }}>NagarSetu</span>
+            <h1 className="relative text-5xl md:text-7xl font-bold mb-6 hero-title-shadow" style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontWeight: 700, letterSpacing: '-0.02em', zIndex: 100 }}>
+              <span className="text-white dark:text-dark-text-primary" style={{ position: 'relative', zIndex: 100 }}>Welcome to </span>
+              <span className="text-white dark:text-dark-text-primary rotating-text" style={{ fontStyle: 'italic', fontSize: '1em', position: 'relative', zIndex: 100, display: 'inline-block' }}>
+                <span className="text-item" style={{ position: 'relative', zIndex: 100, color: 'white' }}>नगरसेतु</span>
+                <span className="text-item" style={{ position: 'absolute', zIndex: 100, color: 'white' }}>NagarSetu</span>
+                <span className="text-item" style={{ position: 'absolute', zIndex: 100, color: 'white' }}>नगरसेतू</span>
+                <span className="text-item" style={{ position: 'absolute', zIndex: 100, color: 'white' }}>ਨਗਰਸੇਤੂ</span>
+                <span className="text-item" style={{ position: 'absolute', zIndex: 100, color: 'white' }}>নগরসেতু</span>
+              </span>
             </h1>
             <p className="text-xl text-primary-100 dark:text-dark-text-secondary mb-8">
               Connecting citizens, municipalities, and contractors to resolve
