@@ -133,7 +133,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <header className="bg-white dark:bg-white shadow-sm ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to={getDashboardLink()} className="flex items-center space-x-2">
