@@ -7,7 +7,7 @@ NagarSetu is a comprehensive civic issue reporting and management platform that 
 - **Citizen Portal**: Report civic issues with photos, location, and descriptions
 - **Municipality Dashboard**: Verify, assign, and track issue resolution
 - **Contractor Interface**: Manage assigned work orders and update resolution status
-- **AI-Powered Chatbot**: Get instant assistance and guidance
+- **AI-Powered Chatbot**: Get instant assistance and guidance. Also it can submit by taking details by citizen itself .
 - **Real-time Notifications**: Stay updated with OneSignal push notifications
 - **Gamification**: Earn points for reporting and resolving issues
 - **Email Verification**: Secure OTP-based email verification system
