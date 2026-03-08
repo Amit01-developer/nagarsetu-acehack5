@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 200" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#87CEEB;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky gradient -->
+  <rect width="1200" height="200" fill="url(#skyGradient)"/>
+  
+  <!-- Buildings -->
+  <!-- Building 1 -->
+  <rect x="0" y="120" width="60" height="80" fill="#2d5016" opacity="0.8"/>
+  <rect x="5" y="125" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="20" y="125" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="35" y="125" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="5" y="145" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="20" y="145" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="35" y="145" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  
+  <!-- Building 2 -->
+  <rect x="70" y="100" width="80" height="100" fill="#1e3a0f" opacity="0.8"/>
+  <rect x="80" y="110" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="100" y="110" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="120" y="110" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="80" y="135" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="100" y="135" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="120" y="135" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="80" y="160" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="100" y="160" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="120" y="160" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  
+  <!-- Building 3 -->
+  <rect x="160" y="130" width="50" height="70" fill="#2d5016" opacity="0.8"/>
+  <rect x="165" y="135" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="180" y="135" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="165" y="155" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="180" y="155" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  
+  <!-- Building 4 - Tall -->
+  <rect x="220" y="60" width="70" height="140" fill="#1e3a0f" opacity="0.8"/>
+  <rect x="230" y="70" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="250" y="70" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="230" y="90" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="250" y="90" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="230" y="110" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="250" y="110" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="230" y="130" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="250" y="130" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="230" y="150" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="250" y="150" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="230" y="170" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="250" y="170" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  
+  <!-- Building 5 -->
+  <rect x="300" y="110" width="65" height="90" fill="#2d5016" opacity="0.8"/>
+  <rect x="310" y="120" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="330" y="120" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="310" y="145" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="330" y="145" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="310" y="170" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="330" y="170" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  
+  <!-- Building 6 -->
+  <rect x="375" y="140" width="55" height="60" fill="#1e3a0f" opacity="0.8"/>
+  <rect x="385" y="150" width="8" height="8" fill="#3d6618" opacity="0.6"/>
+  <rect x="405" y="150" width="8" height="8" fill="#3d6618" opacity="0.6"/>
+  <rect x="385" y="170" width="8" height="8" fill="#3d6618" opacity="0.6"/>
+  <rect x="405" y="170" width="8" height="8" fill="#3d6618" opacity="0.6"/>
+  
+  <!-- Building 7 - Medium tall -->
+  <rect x="440" y="80" width="75" height="120" fill="#2d5016" opacity="0.8"/>
+  <rect x="450" y="90" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="475" y="90" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="450" y="115" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="475" y="115" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="450" y="140" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="475" y="140" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="450" y="165" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="475" y="165" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  
+  <!-- Building 8 -->
+  <rect x="525" y="125" width="60" height="75" fill="#1e3a0f" opacity="0.8"/>
+  <rect x="535" y="135" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="555" y="135" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="535" y="160" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="555" y="160" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  
+  <!-- Building 9 - Tallest -->
+  <rect x="595" y="40" width="85" height="160" fill="#1e3a0f" opacity="0.8"/>
+  <rect x="605" y="50" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="630" y="50" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="655" y="50" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="605" y="75" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="630" y="75" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="655" y="75" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="605" y="100" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="630" y="100" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="655" y="100" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="605" y="125" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="630" y="125" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="655" y="125" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="605" y="150" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="630" y="150" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="655" y="150" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="605" y="175" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="630" y="175" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  <rect x="655" y="175" width="12" height="12" fill="#3d6618" opacity="0.6"/>
+  
+  <!-- Building 10 -->
+  <rect x="690" y="115" width="70" height="85" fill="#2d5016" opacity="0.8"/>
+  <rect x="700" y="125" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="725" y="125" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="700" y="150" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="725" y="150" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="700" y="175" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="725" y="175" width="10" height="10" fill="#4a7c1f" opacity="0.6"/>
+  
+  <!-- Building 11 -->
+  <rect x="770" y="135" width="55" height="65" fill="#1e3a0f" opacity="0.8"/>
+  <rect x="780" y="145" width="8" height="8" fill="#3d6618" opacity="0.6"/>
+  <rect x="800" y="145" width="8" height="8" fill="#3d6618" opacity="0.6"/>
+  <rect x="780" y="170" width="8" height="8" fill="#3d6618" opacity="0.6"/>
+  <rect x="800" y="170" width="8" height="8" fill="#3d6618" opacity="0.6"/>
+  
+  <!-- Building 12 -->
+  <rect x="835" y="95" width="80" height="105" fill="#2d5016" opacity="0.8"/>
+  <rect x="845" y="105" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="870" y="105" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="845" y="130" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="870" y="130" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="845" y="155" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="870" y="155" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="845" y="180" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="870" y="180" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  
+  <!-- Building 13 -->
+  <rect x="925" y="120" width="60" height="80" fill="#1e3a0f" opacity="0.8"/>
+  <rect x="935" y="130" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="955" y="130" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="935" y="155" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="955" y="155" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  
+  <!-- Building 14 - Tall -->
+  <rect x="995" y="70" width="75" height="130" fill="#2d5016" opacity="0.8"/>
+  <rect x="1005" y="80" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1030" y="80" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1005" y="105" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1030" y="105" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1005" y="130" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1030" y="130" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1005" y="155" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1030" y="155" width="12" height="12" fill="#4a7c1f" opacity="0.6"/>
+  
+  <!-- Building 15 -->
+  <rect x="1080" y="130" width="60" height="70" fill="#1e3a0f" opacity="0.8"/>
+  <rect x="1090" y="140" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="1110" y="140" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="1090" y="165" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  <rect x="1110" y="165" width="10" height="10" fill="#3d6618" opacity="0.6"/>
+  
+  <!-- Building 16 -->
+  <rect x="1150" y="110" width="50" height="90" fill="#2d5016" opacity="0.8"/>
+  <rect x="1160" y="120" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1175" y="120" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1160" y="145" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1175" y="145" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1160" y="170" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+  <rect x="1175" y="170" width="8" height="8" fill="#4a7c1f" opacity="0.6"/>
+</svg>

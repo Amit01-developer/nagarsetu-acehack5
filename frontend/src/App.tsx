@@ -103,11 +103,11 @@ const App = () => {
       <Route
         path="/unauthorized"
         element={
-          <div className="min-h-screen flex items-center justify-center bg-primary-50">
+          <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-dark-bg">
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">403</h1>
-              <p className="text-gray-600 mb-6">You don't have permission to access this page.</p>
-              <a href={getDefaultRoute()} className="text-primary-600 hover:text-primary-700 font-medium">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-dark-text-primary mb-4">403</h1>
+              <p className="text-gray-600 dark:text-dark-text-secondary mb-6">You don't have permission to access this page.</p>
+              <a href={getDefaultRoute()} className="text-primary-600 dark:text-dark-accent-blue hover:text-primary-700 dark:hover:text-dark-accent-blue/80 font-medium">
                 Go to Dashboard
               </a>
             </div>
@@ -119,11 +119,11 @@ const App = () => {
       <Route
         path="*"
         element={
-          <div className="min-h-screen flex items-center justify-center bg-primary-50">
+          <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-dark-bg">
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-              <p className="text-gray-600 mb-6">Page not found.</p>
-              <a href="/" className="text-primary-600 hover:text-primary-700 font-medium">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-dark-text-primary mb-4">404</h1>
+              <p className="text-gray-600 dark:text-dark-text-secondary mb-6">Page not found.</p>
+              <a href="/" className="text-primary-600 dark:text-dark-accent-blue hover:text-primary-700 dark:hover:text-dark-accent-blue/80 font-medium">
                 Go Home
               </a>
             </div>

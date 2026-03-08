@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LogOut, Bell, User, Menu, X } from 'lucide-react';
+import { useTheme } from '../../contexts/ThemeContext';
+import { LogOut, Bell, User, Menu, X, Moon, Sun } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import NotificationsDropdown from './NotificationsDropdown';
 import * as notificationApi from '../../api/notificationApi';
@@ -8,6 +9,7 @@ import type { Notification } from '../../types';
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -131,7 +133,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white dark:bg-dark-surface shadow-sm border-b border-gray-200 dark:border-dark-border smooth-transition">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to={getDashboardLink()} className="flex items-center space-x-2">
@@ -140,16 +142,30 @@ const Header = () => {
               alt="NagarSetu Logo"
               className="h-12 w-auto object-contain"
             />
-            <span className="text-xl font-bold text-gray-900">NagarSetu</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-dark-text-primary">NagarSetu</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             {user?.role === 'citizen' && (
-              <div className="flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+              <div className="flex items-center px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full text-sm font-medium">
                 <span>{user.citizen?.totalPoints || 0} points</span>
               </div>
             )}
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-gray-500 dark:text-dark-text-secondary hover:text-gray-700 dark:hover:text-dark-text-primary hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg smooth-transition"
+              aria-label="Toggle theme"
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {theme === 'light' ? (
+                <Moon className="w-5 h-5 theme-toggle-icon" />
+              ) : (
+                <Sun className="w-5 h-5 theme-toggle-icon" />
+              )}
+            </button>
 
             <div className="relative" ref={notificationsRef}>
               <button
@@ -157,7 +173,7 @@ const Header = () => {
                   setIsNotificationsOpen((prev) => !prev);
                   setIsUserMenuOpen(false);
                 }}
-                className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-primary-50 rounded-lg"
+                className="relative p-2 text-gray-500 dark:text-dark-text-secondary hover:text-gray-700 dark:hover:text-dark-text-primary hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg smooth-transition"
                 aria-label="Notifications"
               >
                 <Bell className="w-5 h-5" />
@@ -187,31 +203,31 @@ const Header = () => {
                   setIsUserMenuOpen(!isUserMenuOpen);
                   setIsNotificationsOpen(false);
                 }}
-                className="flex items-center space-x-3 pl-3 border-l border-gray-200 pr-2 py-2 rounded-lg hover:bg-primary-50 transition-colors"
+                className="flex items-center space-x-3 pl-3 border-l border-gray-200 dark:border-dark-border pr-2 py-2 rounded-lg hover:bg-primary-50 dark:hover:bg-dark-card smooth-transition"
               >
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{user?.profile?.name}</p>
-                  <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">{user?.profile?.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-dark-text-secondary capitalize">{user?.role}</p>
                 </div>
-                <div className="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-primary-600" />
+                <div className="w-9 h-9 bg-primary-100 dark:bg-dark-accent-blue/20 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-primary-600 dark:text-dark-accent-blue" />
                 </div>
               </button>
 
               {/* User Dropdown Menu */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-card rounded-lg shadow-lg py-2 z-50 border border-gray-200 dark:border-dark-border">
                   {user?.role === 'citizen' && (
                     <>
                       <Link
                         to="/citizen/profile"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-primary-50"
+                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 dark:text-dark-text-primary hover:bg-primary-50 dark:hover:bg-dark-bg smooth-transition"
                       >
                         <User className="w-4 h-4" />
                         <span>My Profile</span>
                       </Link>
-                      <hr className="my-1" />
+                      <hr className="my-1 border-gray-200 dark:border-dark-border" />
                     </>
                   )}
                   <button
@@ -219,7 +235,7 @@ const Header = () => {
                       handleLogout();
                       setIsUserMenuOpen(false);
                     }}
-                    className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50"
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 dark:text-dark-accent-red hover:bg-red-50 dark:hover:bg-red-900/20 smooth-transition"
                   >
                     <LogOut className="w-4 h-4" />
                     <span>Logout</span>
@@ -245,7 +261,7 @@ const Header = () => {
               setIsUserMenuOpen(false);
               setIsNotificationsOpen(false);
             }}
-            className="md:hidden p-2 text-gray-500 hover:text-gray-700"
+            className="md:hidden p-2 text-gray-500 dark:text-dark-text-secondary hover:text-gray-700 dark:hover:text-dark-text-primary"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -253,29 +269,40 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="md:hidden py-4 border-t border-gray-200 dark:border-dark-border">
             <div className="flex flex-col space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-primary-600" />
+                <div className="w-10 h-10 bg-primary-100 dark:bg-dark-accent-blue/20 rounded-full flex items-center justify-center">
+                  <User className="w-6 h-6 text-primary-600 dark:text-dark-accent-blue" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{user?.profile?.name}</p>
-                  <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
+                  <p className="font-medium text-gray-900 dark:text-dark-text-primary">{user?.profile?.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-dark-text-secondary capitalize">{user?.role}</p>
                 </div>
               </div>
 
               {user?.role === 'citizen' && (
-                <div className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium">
+                <div className="px-3 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-lg text-sm font-medium">
                   {user.citizen?.totalPoints || 0} points earned
                 </div>
               )}
+
+              {/* Theme Toggle in Mobile */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center justify-between px-3 py-2 text-gray-700 dark:text-dark-text-primary hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg smooth-transition"
+              >
+                <span className="flex items-center space-x-2">
+                  {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                  <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+                </span>
+              </button>
 
               <div className="relative" ref={mobileNotificationsRef}>
                 <button
                   type="button"
                   onClick={() => setIsNotificationsOpen((prev) => !prev)}
-                  className="w-full flex items-center justify-between px-3 py-2 text-gray-700 hover:bg-primary-50 rounded-lg"
+                  className="w-full flex items-center justify-between px-3 py-2 text-gray-700 dark:text-dark-text-primary hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg smooth-transition"
                 >
                   <span className="flex items-center space-x-2">
                     <Bell className="w-5 h-5" />
@@ -305,7 +332,7 @@ const Header = () => {
                 <Link
                   to="/citizen/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center space-x-2 px-3 py-2 text-primary-600 hover:bg-primary-50 rounded-lg"
+                  className="flex items-center space-x-2 px-3 py-2 text-primary-600 dark:text-dark-accent-blue hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg smooth-transition"
                 >
                   <User className="w-5 h-5" />
                   <span>My Profile</span>
@@ -314,7 +341,7 @@ const Header = () => {
 
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                className="flex items-center space-x-2 px-3 py-2 text-red-600 dark:text-dark-accent-red hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg smooth-transition"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>

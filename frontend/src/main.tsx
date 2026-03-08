@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import OneSignal from 'react-onesignal'
 import App from './App'
 import { AuthProvider } from './contexts/AuthContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 import './index.css'
 
 const oneSignalAppId =
@@ -27,10 +28,12 @@ const bootstrap = async () => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <BrowserRouter>
-        <AuthProvider>
-          <App />
-          <Toaster position="top-right" />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <App />
+            <Toaster position="top-right" />
+          </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </StrictMode>,
   )

@@ -77,9 +77,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-dark-bg dark:to-dark-surface flex items-center justify-center p-4 smooth-transition">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8 animate-fade-in-scale">
+        <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl p-8 animate-fade-in-scale border border-transparent dark:border-dark-border">
           <div className="text-center mb-8">
             <div className="rounded-lg flex items-center justify-center mx-auto mb-1">
               <img
@@ -88,13 +88,13 @@ const Login = () => {
                 className="h-14 w-auto object-contain"
               />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-            <p className="text-gray-600 mt-2">Sign in to your NagarSetu account</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">Welcome back</h1>
+            <p className="text-gray-600 dark:text-dark-text-secondary mt-2">Sign in to your NagarSetu account</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary mb-2">
                 Email address
               </label>
               <input
@@ -107,16 +107,16 @@ const Login = () => {
                 })}
                 type="email"
                 id="email"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-accent-blue focus:border-transparent smooth-transition bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text-primary"
                 placeholder="you@example.com"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-dark-accent-red">{errors.email.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary mb-2">
                 Password
               </label>
               <div className="relative">
@@ -126,26 +126,26 @@ const Login = () => {
                   })}
                   type={showPassword ? 'text' : 'password'}
                   id="password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all pr-12"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-accent-blue focus:border-transparent smooth-transition pr-12 bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text-primary"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-dark-text-secondary hover:text-gray-700 dark:hover:text-dark-text-primary"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-dark-accent-red">{errors.password.message}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full bg-primary-600 dark:bg-dark-accent-blue text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 dark:hover:bg-dark-accent-blue/80 focus:ring-4 focus:ring-primary-200 dark:focus:ring-dark-accent-blue/30 smooth-transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               {isLoading ? (
                 <LoadingSpinner size="sm" />
@@ -158,9 +158,9 @@ const Login = () => {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-gray-600">
+          <p className="mt-6 text-center text-gray-600 dark:text-dark-text-secondary">
             Don't have an account?{' '}
-            <Link to="/register" className="text-primary-600 font-medium hover:text-primary-700">
+            <Link to="/register" className="text-primary-600 dark:text-dark-accent-blue font-medium hover:text-primary-700 dark:hover:text-dark-accent-blue/80">
               Sign up
             </Link>
           </p>
