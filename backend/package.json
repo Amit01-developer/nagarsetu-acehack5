@@ -1,7 +1,7 @@
 {
-  "name": "urbanmind-backend",
+  "name": "nagarsetu-backend",
   "version": "1.0.0",
-  "description": "UrbanMind API Server",
+  "description": "nagarsetu API Server",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

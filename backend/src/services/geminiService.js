@@ -88,6 +88,7 @@ const callGemini = async (prompt) => {
 const chatWithAI = async (question) => {
   const prompt = `You are a helpful citizen assistant for an urban issue reporting system called NagarSetu. 
 Your role is to help citizens understand how to report issues, what categories are available, and answer general questions about the platform.
+Respond in the same language the citizen uses (English, Hindi, or their local language) and keep answers concise.
 
 Available issue categories:
 - pothole: Road damage, cracks, holes

@@ -61,6 +61,10 @@ export interface Issue {
   resolutionRejectedBy?: string;
   pointsAwarded: boolean;
   resolutionPointsAwarded: boolean;
+  isHotspot?: boolean;
+  hotspotCount?: number;
+  duplicateOf?: string | null;
+  duplicateCount?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -86,6 +90,18 @@ export interface IssueResponse {
   };
 }
 
+export interface Feedback {
+  _id: string;
+  complaint: string | Issue;
+  user: string;
+  qualityRating: number;
+  speedRating: number;
+  rating: number;
+  comment?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const ISSUE_CATEGORIES: { value: IssueCategory; label: string }[] = [
   { value: 'pothole', label: 'Pothole' },
   { value: 'garbage', label: 'Garbage' },
@@ -97,10 +113,10 @@ export const ISSUE_CATEGORIES: { value: IssueCategory; label: string }[] = [
 
 export const ISSUE_STATUSES: { value: IssueStatus; label: string; color: string }[] = [
   { value: 'pending', label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 'verified', label: 'Verified', color: 'bg-blue-100 text-blue-800' },
+  { value: 'verified', label: 'Verified', color: 'bg-primary-100 text-primary-800' },
   { value: 'assigned', label: 'Assigned', color: 'bg-purple-100 text-purple-800' },
   { value: 'in_progress', label: 'In Progress', color: 'bg-orange-100 text-orange-800' },
-  { value: 'completed', label: 'Completed', color: 'bg-teal-100 text-teal-800' },
+  { value: 'completed', label: 'Completed', color: 'bg-primary-100 text-primary-800' },
   { value: 'resolved', label: 'Resolved', color: 'bg-green-100 text-green-800' },
   { value: 'rejected', label: 'Rejected', color: 'bg-red-100 text-red-800' },
 ];

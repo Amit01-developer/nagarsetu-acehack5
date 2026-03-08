@@ -10,6 +10,10 @@ const WorkOrderCard = ({ issue, onUpdateStatus }: WorkOrderCardProps) => {
   const statusConfig = ISSUE_STATUSES.find((s) => s.value === issue.status);
   const categoryConfig = ISSUE_CATEGORIES.find((c) => c.value === issue.category);
   const priorityConfig = ISSUE_PRIORITIES.find((p) => p.value === issue.priority);
+  const latitude = issue.location.coordinates[1];
+  const longitude = issue.location.coordinates[0];
+  const coordsLabel = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -56,9 +60,19 @@ const WorkOrderCard = ({ issue, onUpdateStatus }: WorkOrderCardProps) => {
         {/* Location */}
         <div className="flex items-center text-gray-500 text-sm mb-2">
           <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-          <span className="truncate">
-            {issue.location.address || `${issue.location.coordinates[1].toFixed(4)}, ${issue.location.coordinates[0].toFixed(4)}`}
-          </span>
+          <div className="flex flex-col truncate leading-tight">
+            {issue.location.address && (
+              <span className="text-gray-700 truncate">{issue.location.address}</span>
+            )}
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-primary-600 hover:underline truncate"
+            >
+              {coordsLabel}
+            </a>
+          </div>
         </div>
 
         {/* Dates */}

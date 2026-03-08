@@ -15,6 +15,10 @@ const VerifyModal = ({ issue, onClose, onSubmit }: VerifyModalProps) => {
   const [priority, setPriority] = useState(issue.priority);
   const reporterName = issue.reportedBy?.profile?.name ?? 'Unknown reporter';
   const reporterEmail = issue.reportedBy?.email;
+  const latitude = issue.location.coordinates[1];
+  const longitude = issue.location.coordinates[0];
+  const coordsLabel = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   const handleApprove = async () => {
     setIsLoading(true);
@@ -48,12 +52,19 @@ const VerifyModal = ({ issue, onClose, onSubmit }: VerifyModalProps) => {
             {issue.images.length > 0 && (
               <div className="grid grid-cols-2 gap-2 mb-4">
                 {issue.images.map((img, idx) => (
-                  <img
+                  <a
                     key={idx}
-                    src={img.url}
-                    alt={`Issue ${idx + 1}`}
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
+                    href={img.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block"
+                  >
+                    <img
+                      src={img.url}
+                      alt={`Issue ${idx + 1}`}
+                      className="w-full h-48 object-cover rounded-lg hover:opacity-90"
+                    />
+                  </a>
                 ))}
               </div>
             )}
@@ -69,9 +80,19 @@ const VerifyModal = ({ issue, onClose, onSubmit }: VerifyModalProps) => {
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Location</label>
-                <p className="text-gray-900">
-                  {issue.location.address || `${issue.location.coordinates[1]}, ${issue.location.coordinates[0]}`}
-                </p>
+                <div className="space-y-1 text-sm">
+                  {issue.location.address && (
+                    <p className="text-gray-900">{issue.location.address}</p>
+                  )}
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary-600 hover:underline break-all"
+                  >
+                    {coordsLabel}
+                  </a>
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Reported By</label>

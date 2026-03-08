@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LogOut, Bell, User, Menu, X } from 'lucide-react';
+import { useTheme } from '../../contexts/ThemeContext';
+import { LogOut, Bell, User, Menu, X, Sun, Moon, Type, ZoomIn, ZoomOut } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import NotificationsDropdown from './NotificationsDropdown';
 import * as notificationApi from '../../api/notificationApi';
@@ -8,6 +9,7 @@ import type { Notification } from '../../types';
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme, fontSize, increaseFontSize, decreaseFontSize } = useTheme();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -21,7 +23,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const getDashboardLink = () => {
@@ -131,7 +133,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to={getDashboardLink()} className="flex items-center space-x-2">
@@ -180,6 +182,36 @@ const Header = () => {
                 />
               )}
             </div>
+
+            {/* Font Size Controls */}
+            <div className="flex items-center space-x-1 border-l border-gray-200 pl-3">
+              <button
+                onClick={decreaseFontSize}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-primary-50 rounded-lg"
+                title="Decrease Font Size"
+                aria-label="Decrease font size"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <button
+                onClick={increaseFontSize}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-primary-50 rounded-lg"
+                title="Increase Font Size"
+                aria-label="Increase font size"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-primary-50 rounded-lg"
+              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+              aria-label="Toggle theme"
+            >
+              {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
 
             <div className="relative">
               <button
@@ -311,6 +343,41 @@ const Header = () => {
                   <span>My Profile</span>
                 </Link>
               )}
+
+              {/* Mobile Theme Toggle & Font Controls */}
+              <div className="flex items-center justify-between px-3 py-2 border-t border-b border-gray-200">
+                <div className="flex items-center space-x-2">
+                  <Type className="w-5 h-5 text-gray-500" />
+                  <span className="text-sm text-gray-700">Font Size</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={decreaseFontSize}
+                    className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-primary-50 rounded"
+                    aria-label="Decrease font size"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </button>
+                  <span className="text-sm text-gray-600 min-w-[24px] text-center">{fontSize}px</span>
+                  <button
+                    onClick={increaseFontSize}
+                    className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-primary-50 rounded"
+                    aria-label="Increase font size"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={toggleTheme}
+                className="flex items-center justify-between px-3 py-2 text-gray-700 hover:bg-primary-50 rounded-lg"
+              >
+                <span className="flex items-center space-x-2">
+                  {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                  <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+                </span>
+              </button>
 
               <button
                 onClick={handleLogout}

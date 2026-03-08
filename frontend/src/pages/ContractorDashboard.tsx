@@ -96,7 +96,7 @@ const ContractorDashboard = () => {
                 <p className="text-sm text-gray-500">Total Orders</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
               </div>
-              <Wrench className="w-8 h-8 text-blue-500" />
+              <Wrench className="w-8 h-8 text-primary-600" />
             </div>
           </div>
           <div className="bg-white rounded-xl p-5 shadow-sm animate-fade-up" style={{ ['--anim-delay' as any]: '60ms' }}>

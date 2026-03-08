@@ -82,6 +82,20 @@ const notifyMunicipalities = async ({ issueId, type, title, message, data = {} }
   }
 };
 
+const notifyHotspotDetected = async (issue, count) => {
+  return notifyMunicipalities({
+    issueId: issue._id,
+    type: 'hotspot_detected',
+    title: 'Hotspot detected',
+    message: `There are ${count} reports for ${issue.category.replace('_', ' ')} in the same area.`,
+    data: {
+      issueId: issue._id.toString(),
+      category: issue.category,
+      hotspotCount: count,
+    },
+  });
+};
+
 /**
  * Send push notification via OneSignal
  */
@@ -265,4 +279,5 @@ module.exports = {
   notifyStatusUpdated,
   notifyIssueResolved,
   notifyResolutionRejected,
+  notifyHotspotDetected,
 };

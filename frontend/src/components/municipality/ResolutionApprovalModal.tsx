@@ -50,9 +50,11 @@ const ResolutionApprovalModal = ({
   const reporterName = issue.reportedBy?.profile?.name ?? 'Unknown reporter';
   const contractorName = issue.assignedTo?.profile?.name ?? '—';
   const contractorCompany = issue.assignedTo?.contractor?.company;
-  const locationText =
-    issue.location.address ||
-    `${issue.location.coordinates[1]}, ${issue.location.coordinates[0]}`;
+  const address = issue.location.address;
+  const latitude = issue.location.coordinates[1];
+  const longitude = issue.location.coordinates[0];
+  const coordsLabel = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   const handleApprove = async () => {
     setIsLoading(true);
@@ -108,7 +110,17 @@ const ResolutionApprovalModal = ({
                 <MapPin className="w-4 h-4 text-gray-600 mt-0.5" />
                 <div>
                   <p className="text-xs text-gray-500">Location</p>
-                  <p className="text-sm text-gray-800 break-words">{locationText}</p>
+                  <div className="space-y-1">
+                    {address && <p className="text-sm text-gray-800 break-words">{address}</p>}
+                    <a
+                      href={mapsUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-primary-600 hover:underline break-all"
+                    >
+                      {coordsLabel}
+                    </a>
+                  </div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
@@ -144,23 +156,23 @@ const ResolutionApprovalModal = ({
           </div>
 
           {/* Contractor completion details */}
-          <div className="bg-teal-50 border border-teal-100 rounded-xl p-4">
-            <p className="text-sm font-semibold text-teal-900 mb-3">Work Done (Contractor)</p>
+          <div className="bg-primary-50 border border-primary-100 rounded-xl p-4">
+            <p className="text-sm font-semibold text-primary-900 mb-3">Work Done (Contractor)</p>
 
             {issue.resolutionDetails?.description ? (
               <div className="mb-4">
-                <p className="text-xs text-teal-700 mb-1">Work description</p>
-                <p className="text-sm text-teal-900 whitespace-pre-wrap">
+                <p className="text-xs text-primary-700 mb-1">Work description</p>
+                <p className="text-sm text-primary-900 whitespace-pre-wrap">
                   {issue.resolutionDetails.description}
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-teal-800 mb-4">No work description provided.</p>
+              <p className="text-sm text-primary-800 mb-4">No work description provided.</p>
             )}
 
             {issue.resolutionDetails?.images?.length ? (
               <div>
-                <p className="text-xs text-teal-700 mb-2">Completion photos</p>
+                <p className="text-xs text-primary-700 mb-2">Completion photos</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {issue.resolutionDetails.images.map((img, idx) => (
                     <a
@@ -181,7 +193,7 @@ const ResolutionApprovalModal = ({
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-teal-800">No completion photos uploaded.</p>
+              <p className="text-sm text-primary-800">No completion photos uploaded.</p>
             )}
           </div>
 
@@ -225,4 +237,3 @@ const ResolutionApprovalModal = ({
 };
 
 export default ResolutionApprovalModal;
-

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { Upload, X, MapPin, ArrowLeft, Sparkles, Wand2 } from 'lucide-react';
+import { Upload, X, MapPin, ArrowLeft, Sparkles, Wand2, Camera, Mic, MicOff } from 'lucide-react';
 import Header from '../components/common/Header';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import * as issueApi from '../api/issueApi';
@@ -43,6 +43,9 @@ const LocationMarker = ({ position, setPosition }: LocationMarkerProps) => {
 const ReportIssue = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [imagesPreviews, setImagesPreviews] = useState<string[]>([]);
@@ -50,6 +53,12 @@ const ReportIssue = () => {
   const [isLocating, setIsLocating] = useState(false);
   const [isCategorizing, setIsCategorizing] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isCameraLoading, setIsCameraLoading] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     register,
@@ -62,7 +71,33 @@ const ReportIssue = () => {
   useEffect(() => {
     // Try to get user's location
     getCurrentLocation();
+
+    return () => {
+      stopCameraStream();
+      recognitionRef.current?.stop?.();
+      recognitionRef.current?.abort?.();
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    };
   }, []);
+
+  // Ensure stream attaches once the modal renders
+  useEffect(() => {
+    const attachStream = async () => {
+      if (isCameraOpen && streamRef.current && videoRef.current) {
+        const video = videoRef.current;
+        video.srcObject = streamRef.current;
+        // Muting helps some browsers allow autoplay after user gesture
+        video.muted = true;
+        try {
+          await video.play();
+        } catch (err) {
+          console.error('Video play error', err);
+          setCameraError('Unable to start camera preview. Please try again.');
+        }
+      }
+    };
+    attachStream();
+  }, [isCameraOpen]);
 
   const getCurrentLocation = () => {
     setIsLocating(true);
@@ -120,6 +155,103 @@ const ReportIssue = () => {
     setImagesPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const stopCameraStream = () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  };
+
+  const openCamera = async () => {
+    if (images.length >= 5) {
+      toast.error('Maximum 5 images allowed');
+      return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      toast.error('Camera not supported on this device');
+      return;
+    }
+
+    setIsCameraLoading(true);
+    setCameraError(null);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+
+      streamRef.current = stream;
+      setIsCameraOpen(true);
+    } catch (error) {
+      console.error('Camera error', error);
+      setCameraError('Could not access camera. Please allow permission or use Upload.');
+      toast.error('Camera permission denied or unavailable');
+      stopCameraStream();
+    } finally {
+      setIsCameraLoading(false);
+    }
+  };
+
+  const closeCamera = () => {
+    stopCameraStream();
+    setIsCameraOpen(false);
+    setCameraError(null);
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current || !canvasRef.current) {
+      setCameraError('Camera not ready yet.');
+      return;
+    }
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const width = video.videoWidth || 1280;
+    const height = video.videoHeight || 720;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      setCameraError('Unable to capture photo.');
+      return;
+    }
+
+    ctx.drawImage(video, 0, 0, width, height);
+
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          setCameraError('Failed to capture image');
+          return;
+        }
+
+        if (images.length >= 5) {
+          toast.error('Maximum 5 images allowed');
+          closeCamera();
+          return;
+        }
+
+        const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error('Captured image is too large (max 5MB)');
+          return;
+        }
+
+        const preview = canvas.toDataURL('image/jpeg', 0.9);
+
+        setImages((prev) => [...prev, file]);
+        setImagesPreviews((prev) => [...prev, preview]);
+
+        toast.success('Photo captured');
+        closeCamera();
+      },
+      'image/jpeg',
+      0.9
+    );
+  };
+
   // AI: Auto-categorize issue based on description
   const handleAutoCategorize = async () => {
     const description = watch('description');
@@ -161,6 +293,72 @@ const ReportIssue = () => {
       toast.error(err.response?.data?.message || 'Failed to enhance description');
     } finally {
       setIsEnhancing(false);
+    }
+  };
+
+  // Voice to text for description
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const SpeechRecognitionClass =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionClass) return;
+
+    const recognition = new SpeechRecognitionClass();
+    recognition.lang = 'en-IN';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
+      }
+    };
+    recognition.onerror = () => {
+      setIsListening(false);
+      toast.error('Voice input not available');
+    };
+    recognition.onresult = (event: any) => {
+      let finalText = '';
+      Array.from(event.results).forEach((result: any) => {
+        const text = result[0].transcript.trim();
+        if (result.isFinal) {
+          finalText += `${text} `;
+        }
+      });
+      if (finalText.trim()) {
+        const current = watch('description') || '';
+        const next = `${current ? `${current} ` : ''}${finalText.trim()}`;
+        setValue('description', next);
+        toast.success('Voice captured');
+      }
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = setTimeout(() => {
+        recognition.stop();
+      }, 1500);
+    };
+
+    recognitionRef.current = recognition;
+  }, [setValue, watch]);
+
+  const toggleListening = () => {
+    const recognition = recognitionRef.current;
+    if (!recognition) {
+      toast.error('Voice input not supported in this browser');
+      return;
+    }
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+    try {
+      recognition.start();
+    } catch {
+      toast.error('Unable to start voice input');
     }
   };
 
@@ -254,7 +452,7 @@ const ReportIssue = () => {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Description
+                  Description of Issue
                 </label>
                 <button
                   type="button"
@@ -284,12 +482,27 @@ const ReportIssue = () => {
               {errors.description && (
                 <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
               )}
+              <div className="flex items-center gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  className={`inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border ${
+                    isListening
+                      ? 'border-primary-300 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-primary-400'
+                  }`}
+                >
+                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  <span>{isListening ? 'Listening...' : 'Voice complaint'}</span>
+                </button>
+                <p className="text-xs text-gray-500">Speak and we’ll fill the description for you.</p>
+              </div>
             </div>
 
             {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location
+                Your Current Location
               </label>
               <div className="h-64 rounded-lg overflow-hidden border border-gray-300 mb-2">
                 {isLocating ? (
@@ -330,13 +543,13 @@ const ReportIssue = () => {
             {/* Address */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Address (Optional)
+                Landmark (Optional)
               </label>
               <input
                 {...register('address')}
                 type="text"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter the address or landmark"
+                placeholder="Enter the landmark"
               />
             </div>
 
@@ -382,8 +595,80 @@ const ReportIssue = () => {
                     <span className="text-xs text-gray-500 mt-1">Upload</span>
                   </button>
                 )}
+
+                {images.length < 5 && (
+                  <button
+                    type="button"
+                    onClick={openCamera}
+                    disabled={isCameraLoading}
+                    className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-primary-500 hover:bg-primary-50 transition-colors disabled:opacity-50"
+                  >
+                    {isCameraLoading ? (
+                      <LoadingSpinner size="sm" />
+                    ) : (
+                      <Camera className="w-6 h-6 text-gray-400" />
+                    )}
+                    <span className="text-xs text-gray-500 mt-1">Camera</span>
+                  </button>
+                )}
               </div>
             </div>
+
+            {isCameraOpen && (
+              <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/60 px-4">
+                <div className="bg-white rounded-xl shadow-xl w-full max-w-xl p-4 sm:p-6 animate-pop-in relative">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <Camera className="w-5 h-5 text-primary-600 mr-2" />
+                      <h2 className="text-lg font-semibold text-gray-900">Live Camera</h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={closeCamera}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="relative bg-black rounded-lg overflow-hidden aspect-video">
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="w-full h-full object-contain bg-black"
+                    />
+                    <canvas ref={canvasRef} className="hidden" />
+                    {cameraError && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                        <p className="text-sm text-white text-center px-4">{cameraError}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <p className="text-sm text-gray-500">Align the issue in frame and tap capture.</p>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        type="button"
+                        onClick={closeCamera}
+                        className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={capturePhoto}
+                        className="px-4 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700"
+                      >
+                        Capture Photo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Submit */}
             <button

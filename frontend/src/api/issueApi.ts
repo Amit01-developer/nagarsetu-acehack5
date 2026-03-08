@@ -1,5 +1,5 @@
 import api from './axiosConfig';
-import { IssuesResponse, IssueResponse, Issue, IssueCategory, IssueStatus } from '../types';
+import { IssuesResponse, IssueResponse, Issue, IssueCategory, IssueStatus, Feedback } from '../types';
 
 interface GetIssuesParams {
   status?: IssueStatus;
@@ -17,6 +17,14 @@ interface CreateIssueData {
   longitude: number;
   address?: string;
   images: File[];
+}
+
+interface FeedbackPayload {
+  complaintId: string;
+  qualityRating: number;
+  speedRating: number;
+  rating?: number;
+  comment?: string;
 }
 
 export const getIssues = async (params: GetIssuesParams = {}): Promise<IssuesResponse> => {
@@ -54,9 +62,7 @@ export const createIssue = async (data: CreateIssueData): Promise<IssueResponse>
   });
 
   const response = await api.post<IssueResponse>('/issues', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+    headers: { 'Content-Type': undefined },
   });
   return response.data;
 };
@@ -121,5 +127,12 @@ export const rejectResolution = async (id: string, rejectionReason: string): Pro
 
 export const deleteIssue = async (id: string): Promise<{ success: boolean; message: string }> => {
   const response = await api.delete(`/issues/${id}`);
+  return response.data;
+};
+
+export const submitFeedback = async (
+  payload: FeedbackPayload
+): Promise<{ success: boolean; data: { feedback: Feedback } }> => {
+  const response = await api.post('/feedback', payload);
   return response.data;
 };

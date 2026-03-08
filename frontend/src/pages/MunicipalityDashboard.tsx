@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ClipboardList, CheckCircle, Clock, Users, Search, Filter } from 'lucide-react';
+import { ClipboardList, CheckCircle, Clock, Users, Search, Filter, Flame, X } from 'lucide-react';
+import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
+import L from 'leaflet';
 import Header from '../components/common/Header';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Footer from '../components/common/Footer';
@@ -12,6 +14,7 @@ import { Issue, ISSUE_STATUSES, ISSUE_CATEGORIES, IssueStatus, IssueCategory } f
 import toast from 'react-hot-toast';
 
 const MunicipalityDashboard = () => {
+  const HOTSPOT_THRESHOLD = 20;
   const [issues, setIssues] = useState<Issue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<IssueStatus | ''>('');
@@ -21,6 +24,7 @@ const MunicipalityDashboard = () => {
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showResolutionModal, setShowResolutionModal] = useState(false);
+  const [showHotspotMap, setShowHotspotMap] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -148,25 +152,120 @@ const MunicipalityDashboard = () => {
     );
   });
 
+  const hotspotIssues = issues.filter(
+    (i) => i.isHotspot && (i.hotspotCount || 0) >= HOTSPOT_THRESHOLD
+  );
+  const hasHotspot = hotspotIssues.length > 0;
+
+  const HotspotMapModal = () => {
+    const positions = hotspotIssues
+      .map((i) => ({
+        lat: i.location.coordinates[1],
+        lng: i.location.coordinates[0],
+        count: i.hotspotCount || 0,
+        category: i.category,
+        id: i._id,
+      }))
+      .filter((p) => !Number.isNaN(p.lat) && !Number.isNaN(p.lng));
+
+    const bounds =
+      positions.length > 0
+        ? L.latLngBounds(positions.map((p) => [p.lat, p.lng] as [number, number]))
+        : null;
+
+    return (
+      <div
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) setShowHotspotMap(false);
+        }}
+      >
+        <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-gray-500">Hotspots</p>
+              <p className="text-base font-semibold text-gray-900">
+                {hotspotIssues.length} cluster{hotspotIssues.length === 1 ? '' : 's'} detected
+              </p>
+            </div>
+            <button
+              onClick={() => setShowHotspotMap(false)}
+              className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
+              aria-label="Close hotspot map"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="h-[540px]">
+            <MapContainer
+              style={{ height: '100%', width: '100%' }}
+              center={
+                bounds ? (bounds.getCenter() as any) : { lat: 12.9716, lng: 77.5946 }
+              }
+              zoom={12}
+              whenCreated={(map) => {
+                if (bounds) {
+                  map.fitBounds(bounds, { padding: [30, 30] });
+                }
+              }}
+            >
+              <TileLayer
+                attribution="&copy; OpenStreetMap contributors"
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {positions.map((p) => (
+                <CircleMarker
+                  key={p.id}
+                  center={[p.lat, p.lng]}
+                  radius={10}
+                  pathOptions={{ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.5 }}
+                />
+              ))}
+            </MapContainer>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-primary-50">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Municipality Dashboard</h1>
-          <p className="text-gray-600 mt-1">Manage and verify civic issues in your jurisdiction.</p>
+        <div className="mb-8 flex items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Municipality Dashboard</h1>
+            <p className="text-gray-600 mt-1">Manage and verify civic issues in your jurisdiction.</p>
+          </div>
+          {hasHotspot && (
+            <button
+              type="button"
+              onClick={() => setShowHotspotMap(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-700 rounded-lg border border-red-100 shadow-sm hover:bg-red-100 transition"
+            >
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+              </span>
+              <span className="text-sm font-semibold">
+                Hotspot detected ({hotspotIssues.length})
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <div className="bg-white rounded-xl p-5 shadow-sm animate-fade-up">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Total Issues</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
               </div>
-              <ClipboardList className="w-8 h-8 text-blue-500" />
+              <ClipboardList className="w-8 h-8 text-primary-600" />
             </div>
           </div>
           <div className="bg-white rounded-xl p-5 shadow-sm animate-fade-up" style={{ ['--anim-delay' as any]: '60ms' }}>
@@ -182,9 +281,9 @@ const MunicipalityDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">In Progress</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.verified}</p>
+                <p className="text-2xl font-bold text-primary-600">{stats.verified}</p>
               </div>
-              <Users className="w-8 h-8 text-blue-500" />
+              <Users className="w-8 h-8 text-primary-600" />
             </div>
           </div>
           <div className="bg-white rounded-xl p-5 shadow-sm animate-fade-up" style={{ ['--anim-delay' as any]: '180ms' }}>
@@ -194,6 +293,23 @@ const MunicipalityDashboard = () => {
                 <p className="text-2xl font-bold text-green-600">{stats.resolved}</p>
               </div>
               <CheckCircle className="w-8 h-8 text-green-500" />
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-5 shadow-sm animate-fade-up" style={{ ['--anim-delay' as any]: '240ms' }}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Hotspots</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-2xl font-bold text-red-600">{hotspotIssues.length}</p>
+                  {hasHotspot && (
+                    <span className="inline-flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                      <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                      {HOTSPOT_THRESHOLD}+ reports
+                    </span>
+                  )}
+                </div>
+              </div>
+              <Flame className="w-8 h-8 text-red-500" />
             </div>
           </div>
         </div>
@@ -287,6 +403,8 @@ const MunicipalityDashboard = () => {
             onReject={handleResolutionReject}
           />
         )}
+
+        {showHotspotMap && <HotspotMapModal />}
       </main>
       <Footer />
     </div>

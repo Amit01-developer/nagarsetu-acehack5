@@ -57,7 +57,7 @@ const ProfilePage = () => {
   const getTier = (points: number) => {
     if (points >= 500) return { name: 'Legendary', color: 'text-yellow-600' };
     if (points >= 300) return { name: 'Elite', color: 'text-purple-600' };
-    if (points >= 200) return { name: 'Expert', color: 'text-blue-600' };
+    if (points >= 200) return { name: 'Expert', color: 'text-primary-600' };
     if (points >= 100) return { name: 'Master', color: 'text-green-600' };
     return { name: 'Novice', color: 'text-gray-600' };
   };

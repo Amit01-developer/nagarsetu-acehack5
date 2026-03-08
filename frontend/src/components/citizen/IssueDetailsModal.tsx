@@ -10,6 +10,7 @@ import {
 interface IssueDetailsModalProps {
   issue: Issue;
   onClose: () => void;
+  onFeedback?: (issue: Issue) => void;
 }
 
 const formatDate = (dateString?: string) => {
@@ -25,10 +26,15 @@ const formatDate = (dateString?: string) => {
   });
 };
 
-const IssueDetailsModal = ({ issue, onClose }: IssueDetailsModalProps) => {
+const IssueDetailsModal = ({ issue, onClose, onFeedback }: IssueDetailsModalProps) => {
   const statusConfig = ISSUE_STATUSES.find((s) => s.value === issue.status);
   const categoryConfig = ISSUE_CATEGORIES.find((c) => c.value === issue.category);
   const priorityConfig = ISSUE_PRIORITIES.find((p) => p.value === issue.priority);
+  const address = issue.location.address;
+  const latitude = issue.location.coordinates[1];
+  const longitude = issue.location.coordinates[0];
+  const coordsLabel = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -44,10 +50,6 @@ const IssueDetailsModal = ({ issue, onClose }: IssueDetailsModalProps) => {
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [onClose]);
-
-  const locationText =
-    issue.location.address ||
-    `${issue.location.coordinates[1]}, ${issue.location.coordinates[0]}`;
 
   return (
     <div
@@ -119,7 +121,17 @@ const IssueDetailsModal = ({ issue, onClose }: IssueDetailsModalProps) => {
                   <MapPin className="w-4 h-4 mr-2" />
                   <span className="font-medium">Location</span>
                 </div>
-                <p className="text-gray-800 break-words">{locationText}</p>
+                <div className="space-y-1">
+                  {address && <p className="text-gray-800 break-words">{address}</p>}
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-primary-600 hover:underline break-all"
+                  >
+                    {coordsLabel}
+                  </a>
+                </div>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4">
@@ -146,23 +158,23 @@ const IssueDetailsModal = ({ issue, onClose }: IssueDetailsModalProps) => {
             )}
 
             {(issue.verifiedBy || issue.verificationDate) && (
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <h3 className="text-sm font-semibold text-blue-900 mb-3">Verification</h3>
+              <div className="bg-primary-50 border border-primary-100 rounded-xl p-4">
+                <h3 className="text-sm font-semibold text-primary-900 mb-3">Verification</h3>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div className="flex items-start gap-2">
-                    <User className="w-4 h-4 text-blue-700 mt-0.5" />
+                    <User className="w-4 h-4 text-primary-700 mt-0.5" />
                     <div>
-                      <p className="text-xs text-blue-700">Verified by</p>
-                      <p className="text-sm text-blue-900">
+                      <p className="text-xs text-primary-700">Verified by</p>
+                      <p className="text-sm text-primary-900">
                         {issue.verifiedBy?.profile?.name || '—'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Calendar className="w-4 h-4 text-blue-700 mt-0.5" />
+                    <Calendar className="w-4 h-4 text-primary-700 mt-0.5" />
                     <div>
-                      <p className="text-xs text-blue-700">Verification date</p>
-                      <p className="text-sm text-blue-900">{formatDate(issue.verificationDate)}</p>
+                      <p className="text-xs text-primary-700">Verification date</p>
+                      <p className="text-sm text-primary-900">{formatDate(issue.verificationDate)}</p>
                     </div>
                   </div>
                 </div>
@@ -200,18 +212,18 @@ const IssueDetailsModal = ({ issue, onClose }: IssueDetailsModalProps) => {
             )}
 
             {issue.resolutionDetails && (
-              <div className="bg-teal-50 border border-teal-100 rounded-xl p-4">
-                <h3 className="text-sm font-semibold text-teal-900 mb-3">Resolution</h3>
+              <div className="bg-primary-50 border border-primary-100 rounded-xl p-4">
+                <h3 className="text-sm font-semibold text-primary-900 mb-3">Resolution</h3>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-teal-700 mb-1">Completed date</p>
-                    <p className="text-sm text-teal-900">
+                    <p className="text-xs text-primary-700 mb-1">Completed date</p>
+                    <p className="text-sm text-primary-900">
                       {formatDate(issue.resolutionDetails.completedDate)}
                     </p>
                     {issue.resolutionDetails.description && (
                       <>
-                        <p className="text-xs text-teal-700 mt-3 mb-1">Work description</p>
-                        <p className="text-sm text-teal-900 whitespace-pre-wrap">
+                        <p className="text-xs text-primary-700 mt-3 mb-1">Work description</p>
+                        <p className="text-sm text-primary-900 whitespace-pre-wrap">
                           {issue.resolutionDetails.description}
                         </p>
                       </>
@@ -220,7 +232,7 @@ const IssueDetailsModal = ({ issue, onClose }: IssueDetailsModalProps) => {
 
                   {issue.resolutionDetails.images.length > 0 && (
                     <div>
-                      <p className="text-xs text-teal-700 mb-2">Completion photos</p>
+                      <p className="text-xs text-primary-700 mb-2">Completion photos</p>
                       <div className="grid grid-cols-3 gap-2">
                         {issue.resolutionDetails.images.map((img, idx) => (
                           <a
@@ -255,6 +267,17 @@ const IssueDetailsModal = ({ issue, onClose }: IssueDetailsModalProps) => {
               </div>
             )}
           </div>
+          {(issue.status === 'resolved' || issue.status === 'completed') && onFeedback && (
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => onFeedback(issue)}
+                className="w-full sm:w-auto px-4 py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors shadow"
+              >
+                Leave feedback
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -262,4 +285,3 @@ const IssueDetailsModal = ({ issue, onClose }: IssueDetailsModalProps) => {
 };
 
 export default IssueDetailsModal;
-

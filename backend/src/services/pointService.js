@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const PointsTransaction = require('../models/PointsTransaction');
+const Issue = require('../models/Issue');
 
 const POINTS = {
   ISSUE_VERIFIED: 10,
@@ -131,3 +132,34 @@ exports.awardResolutionPoints = async (userId, issueId, issue) => {
  * Get points configuration
  */
 exports.getPointsConfig = () => POINTS;
+
+/**
+ * Recalculate a user's points and remove orphaned transactions
+ * (e.g., when issues were deleted from the database).
+ */
+exports.reconcileUserPoints = async (userId) => {
+  if (!userId || !mongoose.isValidObjectId(userId)) {
+    return { totalPoints: 0, transactions: [] };
+  }
+
+  const transactions = await PointsTransaction.find({ userId });
+  const issueIds = [...new Set(transactions.map((t) => t.issueId.toString()))];
+
+  // Find existing issues
+  const existingIssues = await Issue.find({ _id: { $in: issueIds } }).select('_id');
+  const existingSet = new Set(existingIssues.map((i) => i._id.toString()));
+
+  // Remove orphaned transactions
+  const orphanIssueIds = issueIds.filter((id) => !existingSet.has(id));
+  if (orphanIssueIds.length) {
+    await PointsTransaction.deleteMany({ userId, issueId: { $in: orphanIssueIds } });
+  }
+
+  // Recompute transactions and total
+  const validTransactions = await PointsTransaction.find({ userId }).sort({ createdAt: -1 });
+  const totalPoints = validTransactions.reduce((sum, t) => sum + (t.points || 0), 0);
+
+  await User.findByIdAndUpdate(userId, { 'citizen.totalPoints': totalPoints });
+
+  return { totalPoints, transactions: validTransactions };
+};

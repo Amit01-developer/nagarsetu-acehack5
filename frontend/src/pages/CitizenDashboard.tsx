@@ -5,6 +5,7 @@ import Header from '../components/common/Header';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Footer from '../components/common/Footer';
 import IssueCard from '../components/citizen/IssueCard';
+import FeedbackModal from '../components/citizen/FeedbackModal';
 import IssueDetailsModal from '../components/citizen/IssueDetailsModal';
 import { useAuth } from '../contexts/AuthContext';
 import * as issueApi from '../api/issueApi';
@@ -18,6 +19,10 @@ const CitizenDashboard = () => {
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [feedbackIssue, setFeedbackIssue] = useState<Issue | null>(null);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -50,14 +55,51 @@ const CitizenDashboard = () => {
     }
   };
 
-  const handleDeleteIssue = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this issue?')) return;
+  const handleDeleteIssue = (id: string) => {
+    setPendingDeleteId(id);
+  };
+
+  const handleSubmitFeedback = async ({
+    qualityRating,
+    speedRating,
+    comment,
+  }: {
+    qualityRating: number;
+    speedRating: number;
+    comment: string;
+  }) => {
+    if (!feedbackIssue) return;
+    setIsSubmittingFeedback(true);
     try {
-      await issueApi.deleteIssue(id);
+      const overall = Math.round((qualityRating + speedRating) / 2);
+      await issueApi.submitFeedback({
+        complaintId: feedbackIssue._id,
+        qualityRating,
+        speedRating,
+        rating: overall,
+        comment: comment || undefined,
+      });
+      toast.success('Feedback submitted');
+      setFeedbackIssue(null);
+    } catch {
+      toast.error('Failed to submit feedback');
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
+
+  const confirmDeleteIssue = async () => {
+    if (!pendingDeleteId) return;
+    setIsDeleting(true);
+    try {
+      await issueApi.deleteIssue(pendingDeleteId);
       toast.success('Issue deleted');
       fetchData();
     } catch {
       toast.error('Failed to delete issue');
+    } finally {
+      setIsDeleting(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -84,8 +126,8 @@ const CitizenDashboard = () => {
                 <p className="text-sm text-gray-500">Total Reports</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
               </div>
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-primary-700" />
               </div>
             </div>
           </div>
@@ -182,14 +224,58 @@ const CitizenDashboard = () => {
                 issue={issue}
                 onDelete={handleDeleteIssue}
                 onView={setSelectedIssue}
+                onFeedback={setFeedbackIssue}
               />
             ))}
           </div>
         )}
       </main>
 
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-2xl border border-gray-200 animate-pop-in">
+            <div className="p-5 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">Delete issue?</h3>
+              <p className="mt-2 text-sm text-gray-600">
+                This will permanently delete the selected issue and cannot be undone.
+              </p>
+            </div>
+            <div className="p-4 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setPendingDeleteId(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteIssue}
+                className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {selectedIssue && (
-        <IssueDetailsModal issue={selectedIssue} onClose={() => setSelectedIssue(null)} />
+        <IssueDetailsModal
+          issue={selectedIssue}
+          onClose={() => setSelectedIssue(null)}
+          onFeedback={setFeedbackIssue}
+        />
+      )}
+      {feedbackIssue && (
+        <FeedbackModal
+          issue={feedbackIssue}
+          isSubmitting={isSubmittingFeedback}
+          onClose={() => setFeedbackIssue(null)}
+          onSubmit={handleSubmitFeedback}
+        />
       )}
       <Footer />
     </div>

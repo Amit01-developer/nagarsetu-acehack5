@@ -5,6 +5,10 @@ const cloudinaryService = require('../services/cloudinaryService');
 const pointService = require('../services/pointService');
 const notificationService = require('../services/notificationService');
 
+const HOTSPOT_THRESHOLD = 20;
+const HOTSPOT_RADIUS_METERS = 300; // ~300m radius considered same area
+const DUPLICATE_RADIUS_METERS = 80; // cluster same complaint
+
 // @desc    Create a new issue
 // @route   POST /api/issues
 // @access  Private (Citizen)
@@ -20,12 +24,50 @@ exports.createIssue = async (req, res, next) => {
 
     const { category, description, latitude, longitude, address } = req.body;
 
-    // Upload images to Cloudinary
+    // Upload images to Cloudinary & compute simple hashes for duplicate detection
     const images = [];
+    const imageHashes = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const result = await cloudinaryService.uploadImage(file.buffer);
         images.push(result);
+        const crypto = require('crypto');
+        const hash = crypto.createHash('md5').update(file.buffer).digest('hex');
+        imageHashes.push(hash);
+      }
+    }
+
+    // Attempt to find an existing nearby issue to merge into (duplicate detection)
+    const nearbyPrimary = await Issue.findOne({
+      category,
+      status: { $nin: ['resolved', 'rejected'] },
+      duplicateOf: null,
+      location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+          },
+          $maxDistance: DUPLICATE_RADIUS_METERS,
+        },
+      },
+    })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    // If we found a likely duplicate based on proximity (and optionally image hash match), attach to it
+    let duplicateOfId = null;
+    if (nearbyPrimary) {
+      if (
+        imageHashes.length === 0 ||
+        (nearbyPrimary.imageHashes || []).some((h) => imageHashes.includes(h)) ||
+        true // always merge on proximity to keep dashboard clean
+      ) {
+        duplicateOfId = nearbyPrimary._id;
+        await Issue.updateOne(
+          { _id: nearbyPrimary._id },
+          { $inc: { duplicateCount: 1 } }
+        );
       }
     }
 
@@ -39,16 +81,72 @@ exports.createIssue = async (req, res, next) => {
         address,
       },
       images,
+      imageHashes,
       status: 'pending',
+      isHotspot: false,
+      hotspotCount: 0,
+      duplicateOf: duplicateOfId,
     });
 
     await issue.populate('reportedBy', 'profile.name email');
 
-    // Notify municipalities about the newly reported issue
+    // Notify municipalities about the newly reported issue (only for primary issues)
     try {
-      await notificationService.notifyIssueReported(issue);
+      if (!issue.duplicateOf) {
+        await notificationService.notifyIssueReported(issue);
+      }
     } catch (error) {
       console.error('Error notifying municipalities:', error);
+    }
+
+    // Detect hotspot clusters (same category within small radius)
+    try {
+      const nearbyCount = await Issue.countDocuments({
+        category,
+        status: { $ne: 'rejected' },
+        duplicateOf: null,
+        location: {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [parseFloat(longitude), parseFloat(latitude)],
+            },
+            $maxDistance: HOTSPOT_RADIUS_METERS,
+          },
+        },
+      });
+
+      const crossedThreshold =
+        nearbyCount >= HOTSPOT_THRESHOLD && nearbyCount - 1 < HOTSPOT_THRESHOLD;
+
+      // Trigger when threshold reached; keep hotspot flags in sync when above threshold
+      if (nearbyCount >= HOTSPOT_THRESHOLD) {
+        const radiusInRadians = HOTSPOT_RADIUS_METERS / 6378137; // Earth radius meters
+        await Issue.updateMany(
+          {
+            category,
+            status: { $ne: 'rejected' },
+            duplicateOf: null,
+            location: {
+              $geoWithin: {
+                $centerSphere: [
+                  [parseFloat(longitude), parseFloat(latitude)],
+                  radiusInRadians,
+                ],
+              },
+            },
+          },
+          { isHotspot: true, hotspotCount: nearbyCount }
+        );
+
+        issue.isHotspot = true;
+        issue.hotspotCount = nearbyCount;
+        if (crossedThreshold) {
+          await notificationService.notifyHotspotDetected(issue, nearbyCount);
+        }
+      }
+    } catch (error) {
+      console.error('Hotspot detection failed:', error);
     }
 
     res.status(201).json({
@@ -82,7 +180,6 @@ exports.getIssues = async (req, res, next) => {
     } else if (req.user.role === 'contractor') {
       query.assignedTo = req.user._id;
     }
-    // Municipality sees all issues
 
     // Apply filters
     if (status) {

@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const PointsTransaction = require('../models/PointsTransaction');
+const pointService = require('../services/pointService');
 
 // @desc    Get user profile
 // @route   GET /api/users/profile
@@ -53,17 +54,24 @@ exports.updateProfile = async (req, res, next) => {
 // @access  Private (Citizen)
 exports.getPoints = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id);
-    const transactions = await PointsTransaction.find({ userId: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(50)
-      .populate('issueId', 'category description');
+    const { totalPoints, transactions } = await pointService.reconcileUserPoints(req.user._id);
+
+    const limited = transactions
+      .slice(0, 50)
+      .map((t) => t)
+      .reverse()
+      .reverse(); // no-op, keep order; kept slice for potential future transforms
+
+    await PointsTransaction.populate(limited, {
+      path: 'issueId',
+      select: 'category description',
+    });
 
     res.json({
       success: true,
       data: {
-        totalPoints: user.citizen?.totalPoints || 0,
-        transactions,
+        totalPoints,
+        transactions: limited,
       },
     });
   } catch (error) {

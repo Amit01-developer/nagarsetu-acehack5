@@ -105,6 +105,27 @@ const issueSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isHotspot: {
+      type: Boolean,
+      default: false,
+    },
+    hotspotCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    duplicateOf: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Issue',
+      default: null,
+      index: true,
+    },
+    duplicateCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    imageHashes: [String],
   },
   {
     timestamps: true,
@@ -121,5 +142,7 @@ issueSchema.index({ status: 1 });
 issueSchema.index({ category: 1 });
 issueSchema.index({ createdAt: -1 });
 issueSchema.index({ status: 1, createdAt: -1 });
+issueSchema.index({ isHotspot: 1, category: 1 });
+issueSchema.index({ location: '2dsphere', category: 1, status: 1 });
 
 module.exports = mongoose.model('Issue', issueSchema);
